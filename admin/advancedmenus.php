@@ -16,4 +16,4 @@ if (!JFactory::getUser()->authorise('core.manage', 'com_advancedmenus')) {
 require_once JPATH_COMPONENT_ADMINISTRATOR.'/fof/include.php';
 
 // Dispatch
-FOFDispatcher::getAnInstance('advancedmenus')->dispatch();
+FOFDispatcher::getTmpInstance('com_advancedmenus')->dispatch();
