@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="component" version="3.0" method="upgrade">
+	<name>com_advancedmenus</name>
+	<author>Weble</author>
+	<creationDate>April 2013</creationDate>
+	<copyright>(C) 2013 Weble Srl. All rights reserved.	</copyright>
+	<license>GNU General Public License version 3 or later; see	LICENSE.txt</license>
+	<authorEmail>info@weble.it</authorEmail>
+	<authorUrl>www.weble.it</authorUrl>
+	<version>1.0.0</version>
+	<description></description>
+	<administration>
+		<files folder="admin">
+			<filename>config.xml</filename>
+			<filename>index.html</filename>
+			<filename>advancedmenus.php</filename>
+			<folder>controllers</folder>
+			<folder>fof</folder>
+			<folder>models</folder>
+			<folder>tables</folder>
+			<folder>views</folder>
+		</files>
+		<languages folder="admin">
+			<language tag="en-GB">language/en-GB.com_advancedmenus.ini</language>
+			<language tag="en-GB">language/en-GB.com_advancedmenus.sys.ini</language>
+		</languages>
+	</administration>
+</extension>
