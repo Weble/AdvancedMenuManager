@@ -17,6 +17,7 @@
 			<folder>controllers</folder>
 			<folder>fof</folder>
 			<folder>models</folder>
+			<folder>helpers</folder>
 			<folder>tables</folder>
 			<folder>views</folder>
 		</files>

@@ -164,7 +164,8 @@ class AdvancedmenusModelItems extends FOFModel {
 			}
 			elseif (!empty($filterState) || ($filterState === '0'))
 			{
-				if ($filterName != 'published') {
+				// Special states
+				if (!in_array($filterName, array('published', 'access', 'level'))) {
 					$query->where('(' . $db->qn($fieldname) . '=' . $db->q($filterState) . ')');
 				}
 			}
@@ -226,7 +227,7 @@ class AdvancedmenusModelItems extends FOFModel {
 		$query->where('a.client_id = 0');
 
 		// Filter on the published state.
-		$published = $this->getState('published', '', 'int');
+		$published = $this->getState('published', '', 'cmd');
 		if (is_numeric($published))
 		{
 			$query->where('a.published = '.(int) $published);
@@ -234,6 +235,16 @@ class AdvancedmenusModelItems extends FOFModel {
 		elseif ($published === '')
 		{
 			$query->where('(a.published IN (0, 1))');
+		}
+
+		// Filter on the access level.
+		if ($access = $this->getState('access')) {
+			$query->where('a.access = '.(int) $access);
+		}
+
+		// Filter on the level.
+		if ($level = $this->getState('level')) {
+			$query->where('a.level <= '.(int) $level);
 		}
 
 		// Filter by search in title, alias or id

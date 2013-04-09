@@ -3,6 +3,7 @@ defined('_JEXEC') or die;
 
 // Include the component HTML helpers.
 JHtml::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_menus/helpers/html');
+$this->loadHelper('select');
 
 $user		= JFactory::getUser();
 $app		= JFactory::getApplication();
@@ -22,12 +23,18 @@ $assoc 		= isset($app->item_associations) ? $app->item_associations : 0;
 				</th>
 				<th class="title">
 					<?php echo JHtml::_('grid.sort', 'JGLOBAL_TITLE', 'a.title', $this->lists->order_Dir, $this->lists->order); ?>
+					<span class="pull-right"><?php echo JText::_('COM_ADVANCEDMENUS_MENU_MENUTYPE_LABEL'); ?></span>
 				</th>
 				<th width="10%" class="nowrap center">
 					<?php echo JHtml::_('grid.sort', 'JSTATUS', 'a.published', $this->lists->order_Dir, $this->lists->order); ?>
 				</th>
+				<?php /*
 				<th width="5%" class="nowrap hidden-phone">
 					<?php echo JHtml::_('grid.sort', 'COM_ADVANCEDMENUS_HEADING_HOME', 'a.home', $this->lists->order_Dir, $this->lists->order); ?>
+				</th>
+				*/ ?>
+				<th width="10%" class="nowrap hidden-phone">
+					<?php echo JHtml::_('grid.sort',  'JGRID_HEADING_ORDERING', 'a.access', $this->lists->order_Dir, $this->lists->order); ?>
 				</th>
 				<th width="10%" class="nowrap hidden-phone">
 					<?php echo JHtml::_('grid.sort',  'JGRID_HEADING_ACCESS', 'a.access', $this->lists->order_Dir, $this->lists->order); ?>
@@ -65,20 +72,25 @@ $assoc 		= isset($app->item_associations) ? $app->item_associations : 0;
 						<?php echo JText::_('JSEARCH_RESET'); ?>
 					</button>
 					</nobr>
+					<?php $menutype = $this->getModel()->getState('menutype',''); ?>
+					<?php echo AdvancedmenusHelperSelect::menutype($menutype, 'menutype', array('class' => 'pull-right span2')); ?>
+					<?php $level = $this->getModel()->getState('level',''); ?>
+					<?php echo AdvancedmenusHelperSelect::levels($level, 'level', array('class' => 'pull-right span2')); ?>
 				</td>
 				<td class="form-seach">
 					<?php $published = $this->getModel()->getState('published',''); ?>
-					<select name="published">
-						<option value="" <?php if ($published == ''): ?> selected="selected" <?php endif; ?>>Unselect</option>
-						<option value="1" <?php if ($published == '1'): ?> selected="selected" <?php endif; ?>><?php echo JText::_('JPUBLISHED'); ?></option>
-					</select>
+					<?php echo AdvancedmenusHelperSelect::published($published, 'published', array('class' => 'span2')); ?>
 				</td>
 				<td>
 
 				</td>
-				<td></td>
 				<td>
-					
+					<?php $access = $this->getModel()->getState('access',''); ?>
+					<?php echo AdvancedmenusHelperSelect::access($access, 'access', array('class' => 'span2')); ?>
+				</td>
+				<td>
+					<?php $language = $this->getModel()->getState('language',''); ?>
+					<?php echo AdvancedmenusHelperSelect::languages($language, 'language', array('class' => 'span3')); ?>
 				</td>
 				<td>
 					
@@ -97,6 +109,7 @@ $assoc 		= isset($app->item_associations) ? $app->item_associations : 0;
 		<?php
 		$originalOrders = array();
 		foreach ($this->items as $i => $item) :
+			$orderkey = array_search($item->id, $this->ordering[$item->parent_id]);
 			$canCreate  = $user->authorise('core.create',     'com_advancedmenus');
 			$canEdit    = $user->authorise('core.edit',       'com_advancedmenus');
 			$canCheckin = $user->authorise('core.manage',     'com_checkin') || $item->checked_out == $user->get('id')|| $item->checked_out == 0;
@@ -178,6 +191,7 @@ $assoc 		= isset($app->item_associations) ? $app->item_associations : 0;
 				<td class="center">
 					<?php echo JHtml::_('MenusHtml.Menus.state', $item->published, $i, $canChange, 'cb'); ?>
 				</td>
+				<?php /*
 				<td class="center hidden-phone">
 					<?php if ($item->type == 'component') : ?>
 						<?php if ($item->language == '*' || $item->home == '0'):?>
@@ -191,6 +205,10 @@ $assoc 		= isset($app->item_associations) ? $app->item_associations : 0;
 						<?php endif;?>
 					<?php endif; ?>
 				</td>
+				*/ ?>
+			<td class="small hidden-phone">
+				<?php echo $orderkey + 1; ?>
+			</td>
 			<td class="small hidden-phone">
 				<?php echo $this->escape($item->access_level); ?>
 			</td>
@@ -230,7 +248,7 @@ $assoc 		= isset($app->item_associations) ? $app->item_associations : 0;
 <script type="text/javascript">
 akeeba.jQuery(document).ready(function($){
 	$('.filters select').change(function(){
-		$('#adminForm').submit();
+		this.form.submit();
 	});
 });
 </script>
