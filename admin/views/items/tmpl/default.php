@@ -1,12 +1,15 @@
 <?php
 defined('_JEXEC') or die;
 
+// Include the component HTML helpers.
+JHtml::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_menus/helpers/html');
+
 $user		= JFactory::getUser();
 $app		= JFactory::getApplication();
 $assoc 		= isset($app->item_associations) ? $app->item_associations : 0;
 
 ?>
-<?php //Set up the filter bar. ?>
+
 <form action="<?php echo JRoute::_('index.php?option=com_advancedmenus&view=items');?>" method="post" name="adminForm" id="adminForm">
 	<table class="table table-striped" id="itemList">
 		<thead>
@@ -17,29 +20,69 @@ $assoc 		= isset($app->item_associations) ? $app->item_associations : 0;
 				<th width="1%" class="hidden-phone">
 					<input type="checkbox" name="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 				</th>
-				<th width="1%" class="nowrap center">
-					<?php echo JHtml::_('grid.sort', 'JSTATUS', 'a.published', $this->lists->order_Dir, $this->lists->order); ?>
-				</th>
 				<th class="title">
 					<?php echo JHtml::_('grid.sort', 'JGLOBAL_TITLE', 'a.title', $this->lists->order_Dir, $this->lists->order); ?>
+				</th>
+				<th width="10%" class="nowrap center">
+					<?php echo JHtml::_('grid.sort', 'JSTATUS', 'a.published', $this->lists->order_Dir, $this->lists->order); ?>
 				</th>
 				<th width="5%" class="nowrap hidden-phone">
 					<?php echo JHtml::_('grid.sort', 'COM_ADVANCEDMENUS_HEADING_HOME', 'a.home', $this->lists->order_Dir, $this->lists->order); ?>
 				</th>
-			<th width="10%" class="nowrap hidden-phone">
-				<?php echo JHtml::_('grid.sort',  'JGRID_HEADING_ACCESS', 'a.access', $this->lists->order_Dir, $this->lists->order); ?>
-			</th>
-			<?php if ($assoc) : ?>
-			<th width="5%" class="nowrap hidden-phone">
-				<?php echo JHtml::_('grid.sort', 'COM_ADVANCEDMENUS_HEADING_ASSOCIATION', 'association', $this->lists->order_Dir, $this->lists->order); ?>
-			</th>
-			<?php endif; ?>
-			<th width="5%" class="nowrap hidden-phone">
-				<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_LANGUAGE', 'language', $this->lists->order_Dir, $this->lists->order); ?>
-			</th>
-			<th width="1%" class="nowrap hidden-phone">
-				<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_ID', 'a.id', $this->lists->order_Dir, $this->lists->order); ?>
-			</th>
+				<th width="10%" class="nowrap hidden-phone">
+					<?php echo JHtml::_('grid.sort',  'JGRID_HEADING_ACCESS', 'a.access', $this->lists->order_Dir, $this->lists->order); ?>
+				</th>
+				<?php if ($assoc) : ?>
+				<th width="5%" class="nowrap hidden-phone">
+					<?php echo JHtml::_('grid.sort', 'COM_ADVANCEDMENUS_HEADING_ASSOCIATION', 'association', $this->lists->order_Dir, $this->lists->order); ?>
+				</th>
+				<?php endif; ?>
+				<th width="5%" class="nowrap hidden-phone">
+					<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_LANGUAGE', 'language', $this->lists->order_Dir, $this->lists->order); ?>
+				</th>
+				<th width="1%" class="nowrap hidden-phone">
+					<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_ID', 'a.id', $this->lists->order_Dir, $this->lists->order); ?>
+				</th>
+			</tr>
+			<tr class="filters">
+				<td>
+					
+				</td>
+				<td>
+
+				</td>
+				<td class="form-search">
+					<input type="text" name="search" id="search"
+						value="<?php echo $this->escape($this->getModel()->getState('search',''));?>"
+						class="input-small" onchange="document.adminForm.submit();"
+						placeholder=""
+						/>
+					<nobr>
+					<button class="btn btn-mini" onclick="this.form.submit();">
+						<?php echo JText::_('JSEARCH_FILTER'); ?>
+					</button>
+					<button class="btn btn-mini" onclick="document.adminForm.search.value='';this.form.submit();">
+						<?php echo JText::_('JSEARCH_RESET'); ?>
+					</button>
+					</nobr>
+				</td>
+				<td class="form-seach">
+					<?php $published = $this->getModel()->getState('published',''); ?>
+					<select name="published">
+						<option value="" <?php if ($published == ''): ?> selected="selected" <?php endif; ?>>Unselect</option>
+						<option value="1" <?php if ($published == '1'): ?> selected="selected" <?php endif; ?>><?php echo JText::_('JPUBLISHED'); ?></option>
+					</select>
+				</td>
+				<td>
+
+				</td>
+				<td></td>
+				<td>
+					
+				</td>
+				<td>
+					
+				</td>
 			</tr>
 		</thead>
 		<tfoot>
@@ -104,9 +147,6 @@ $assoc 		= isset($app->item_associations) ? $app->item_associations : 0;
 				<td class="center hidden-phone">
 					<?php echo JHtml::_('grid.id', $i, $item->id); ?>
 				</td>
-				<td class="center">
-					<?php echo JHtml::_('MenusHtml.Menus.state', $item->published, $i, $canChange, 'cb'); ?>
-				</td>
 				<td>
 					<?php echo str_repeat('<span class="gi">|&mdash;</span>', $item->level - 1) ?>
 					<?php if ($item->checked_out) : ?>
@@ -134,6 +174,9 @@ $assoc 		= isset($app->item_associations) ? $app->item_associations : 0;
 						<span title="<?php echo isset($item->item_type_desc) ? htmlspecialchars($this->escape($item->item_type_desc), ENT_COMPAT, 'UTF-8') : ''; ?>">
 							<?php echo $this->escape($item->item_type); ?></span>
 					</div>
+				</td>
+				<td class="center">
+					<?php echo JHtml::_('MenusHtml.Menus.state', $item->published, $i, $canChange, 'cb'); ?>
 				</td>
 				<td class="center hidden-phone">
 					<?php if ($item->type == 'component') : ?>
@@ -183,3 +226,11 @@ $assoc 		= isset($app->item_associations) ? $app->item_associations : 0;
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists->order_Dir; ?>" />
 	<?php echo JHtml::_('form.token'); ?>
 </form>
+
+<script type="text/javascript">
+akeeba.jQuery(document).ready(function($){
+	$('.filters select').change(function(){
+		$('#adminForm').submit();
+	});
+});
+</script>

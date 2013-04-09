@@ -2,6 +2,53 @@
 
 class AdvancedmenusModelMenus extends FOFModel {
 
+	public function getModuleId() 
+	{
+		$db = $this->getDbo();
+		$query = $db->getQuery(true);
+
+		$query->select('e.extension_id')
+			->from('#__extensions AS e')
+			->where('e.type = ' . $db->quote('module'))
+			->where('e.element = ' . $db->quote('mod_menu'))
+			->where('e.client_id = 0');
+		$db->setQuery($query);
+
+		return $db->loadResult();
+	}
+
+	public function &getModules()
+	{
+		$db = $this->getDbo();
+
+		$query = $db->getQuery(true);
+		$query->from('#__modules as a');
+		$query->select('a.id, a.title, a.params, a.position');
+		$query->where('module = '.$db->quote('mod_menu'));
+		$query->select('ag.title AS access_title');
+		$query->join('LEFT', '#__viewlevels AS ag ON ag.id = a.access');
+		$db->setQuery($query);
+
+		$modules = $db->loadObjectList();
+
+		$result = array();
+
+		foreach ($modules as &$module)
+		{
+			$params = new JRegistry;
+			$params->loadString($module->params);
+
+			$menuType = $params->get('menutype');
+			if (!isset($result[$menuType]))
+			{
+				$result[$menuType] = array();
+			}
+			$result[$menuType][] = &$module;
+		}
+
+		return $result;
+	}
+
 	/**
 	 * Original credits to Joomla com_advancedmenus
 	 */

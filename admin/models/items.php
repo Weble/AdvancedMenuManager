@@ -128,9 +128,15 @@ class AdvancedmenusModelItems extends FOFModel {
 		$tableKey = $table->getKeyName();
 		$db = $this->getDBO();
 
-		$query = $db->getQuery(true)
-			->select('*')
-			->from($db->qn($tableName) . ' AS a');
+		$query = $db->getQuery(true);
+		// Select all fields from the table.
+		$query->select(
+			$db->quoteName(
+				array('a.id', 'a.menutype', 'a.title', 'a.alias', 'a.note', 'a.path', 'a.link', 'a.type', 'a.parent_id', 'a.level', 'a.published', 'a.component_id', 'a.checked_out', 'a.checked_out_time', 'a.browserNav', 'a.access', 'a.img', 'a.template_style_id', 'a.params', 'a.lft', 'a.rgt', 'a.home', 'a.language', 'a.client_id'),
+				array(null, null, null, null, null, null, null, null, null, null, 'apublished', null, null, null, null, null, null, null, null, null, null, null, null, null)
+			)
+		);
+		$query->from($db->qn($tableName) . ' AS a');
 
 		$where = array();
 
@@ -158,17 +164,8 @@ class AdvancedmenusModelItems extends FOFModel {
 			}
 			elseif (!empty($filterState) || ($filterState === '0'))
 			{
-				switch ($fieldname)
-				{
-					case $table->getColumnAlias('title'):
-					case $table->getColumnAlias('description'):
-						$query->where('(' . $db->qn($fieldname) . ' LIKE ' . $db->q('%' . $filterState . '%') . ')');
-
-						break;
-
-					default:
-						$query->where('(' . $db->qn($fieldname) . '=' . $db->q($filterState) . ')');
-						break;
+				if ($filterName != 'published') {
+					$query->where('(' . $db->qn($fieldname) . '=' . $db->q($filterState) . ')');
 				}
 			}
 		}
@@ -207,29 +204,40 @@ class AdvancedmenusModelItems extends FOFModel {
 		$query->join('LEFT', $db->quoteName('#__extensions').' AS c ON c.extension_id = a.component_id');
 
 		// Join over the asset groups.
-		$query->select('ag.title AS access_level');
-		$query->join('LEFT', '#__viewlevels AS ag ON ag.id = a.access');
+		$query->select('vl.title AS access_level');
+		$query->join('LEFT', $db->quoteName('#__viewlevels') . ' AS vl ON vl.id = a.access');
 
 		// Join over the associations.
 		$assoc = isset($app->item_associations) ? $app->item_associations : 0;
 		if ($assoc)
 		{
 			$query->select('COUNT(asso2.id)>1 as association');
-			$query->join('LEFT', '#__associations AS asso ON asso.id = a.id AND asso.context='.$db->quote('com_menus.item'));
-			$query->join('LEFT', '#__associations AS asso2 ON asso2.key = asso.key');
+			$query->join('LEFT', $db->quoteName('#__associations') .' AS asso ON asso.id = a.id AND asso.context='.$db->quote('com_menus.item'));
+			$query->join('LEFT', $db->quoteName('#__associations') .' AS asso2 ON asso2.key = asso.key');
 			$query->group('a.id');
 		}
 
 		// Join over the extensions
 		$query->select('e.name AS name');
-		$query->join('LEFT', '#__extensions AS e ON e.extension_id = a.component_id');
+		$query->join('LEFT', $db->quoteName('#__extensions') .' AS e ON e.extension_id = a.component_id');
 
 		// Exclude the root category.
 		$query->where('a.id > 1');
 		$query->where('a.client_id = 0');
 
+		// Filter on the published state.
+		$published = $this->getState('published', '', 'int');
+		if (is_numeric($published))
+		{
+			$query->where('a.published = '.(int) $published);
+		} 
+		elseif ($published === '')
+		{
+			$query->where('(a.published IN (0, 1))');
+		}
+
 		// Filter by search in title, alias or id
-		if ($search = trim($this->getState()->get('filter.search')))
+		if ($search = trim($this->getState('search')))
 		{
 			if (stripos($search, 'id:') === 0)
 			{
@@ -246,6 +254,9 @@ class AdvancedmenusModelItems extends FOFModel {
 				$query->where('('.'a.title LIKE '.$search.' OR a.alias LIKE '.$search.' OR a.note LIKE '.$search.')');
 			}
 		}
+
+		//echo nl2br(str_replace("#__", "fqu0o_", $query));
+
 		return $query;
 	}
 

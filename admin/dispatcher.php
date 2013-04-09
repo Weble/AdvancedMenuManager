@@ -10,7 +10,8 @@ class AdvancedmenusDispatcher extends FOFDispatcher
 		if($result) {
 			// Load Akeeba Strapper
 			include_once JPATH_ROOT.'/media/akeeba_strapper/strapper.php';
-			AkeebaStrapper::$tag = AKEEBAMEDIATAG;
+			$tag = uniqid();
+			AkeebaStrapper::$tag = $tag;
 			AkeebaStrapper::bootstrap();
 			AkeebaStrapper::jQueryUI();
 			AkeebaStrapper::addJSfile('media://com_akeeba/js/gui-helpers.js');

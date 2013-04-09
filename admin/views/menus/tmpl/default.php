@@ -10,6 +10,8 @@
 defined('_JEXEC') or die;
 
 $user = JFactory::getUser();
+$uri = JUri::getInstance();
+$return = base64_encode($uri);
 ?>
 
 <form action="<?php echo JRoute::_('index.php?option=com_advancedmenus&view=menus');?>" method="post" name="adminForm" id="adminForm">
@@ -58,7 +60,7 @@ $user = JFactory::getUser();
 				</td>
 				<td>
 					<a href="<?php echo JRoute::_('index.php?option=com_advancedmenus&view=items&menutype='.$item->menutype) ?> ">
-						<?php echo $this->escape($item->title); ?></a>
+						<?php echo $this->escape($item->title); ?>123</a>
 					<p class="small">(<span><?php echo JText::_('COM_ADVANCEDMENUS_MENU_MENUTYPE_LABEL') ?></span>
 						<?php if ($canEdit) : ?>
 							<?php echo '<a href="'.JRoute::_('index.php?option=com_advancedmenus&task=menu.edit&id='.$item->id).' title='.$this->escape($item->description).'">'.
@@ -100,8 +102,8 @@ $user = JFactory::getUser();
 								<?php endforeach; ?>
 							</ul>
 						 </div>
-					<?php elseif ($modMenuId) : ?>
-					<a href="<?php echo JRoute::_('index.php?option=com_modules&task=module.add&eid=' . $modMenuId . '&params[menutype]='.$item->menutype); ?>">
+					<?php elseif ($this->modMenuId) : ?>
+					<a href="<?php echo JRoute::_('index.php?option=com_modules&task=module.add&eid=' . $this->modMenuId . '&params[menutype]='.$item->menutype); ?>">
 						<?php echo JText::_('COM_ADVANCEDMENUS_ADD_MENU_MODULE'); ?></a>
 					<?php endif; ?>
 				</td>
